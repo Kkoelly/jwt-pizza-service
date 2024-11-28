@@ -86,7 +86,6 @@ franchiseRouter.post(
     if (!req.user.isRole(Role.Admin)) {
       throw new StatusCodeError('unable to create a franchise', 403);
     }
-
     const franchise = req.body;
     res.send(await DB.createFranchise(franchise));
   })

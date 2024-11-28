@@ -3,3 +3,5 @@
 config.js
 coverage
 dist
+jest.config.json
+settings.json
