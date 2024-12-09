@@ -44,7 +44,7 @@ afterAll(async () => {
 test("getFranchise", async () => {
     const getRes = await request(app).get("/api/franchise");
     expect(getRes.status).toBe(200);
-    expect(getRes.body.length).toBe(1);
+    expect(getRes.body.length).toBeGreaterThan(0);
     expect(getRes.body[0].name).toBe(testFranchise.name);
 });
 

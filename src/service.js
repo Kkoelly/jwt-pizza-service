@@ -21,7 +21,7 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use(metrics.requestTracker);
+app.use(metrics.requestTracker.bind(metrics));
 // app.use(logger.httpLogger);
 
 const apiRouter = express.Router();
