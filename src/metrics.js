@@ -56,18 +56,21 @@ class Metrics {
             case "POST":
                 this.postTotal += 1;
                 this.totalRequests += 1;
-
+                break;
             case "GET":
                 this.getTotal += 1;
                 this.totalRequests += 1;
+                break;
 
             case "DELETE":
                 this.deleteTotal += 1;
                 this.totalRequests += 1;
+                break;
 
             case "PUT":
                 this.putTotal += 1;
                 this.totalRequests += 1;
+                break;
 
             default:
                 this.totalRequests += 1;

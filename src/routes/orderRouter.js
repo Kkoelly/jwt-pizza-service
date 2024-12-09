@@ -152,7 +152,7 @@ orderRouter.post(
             metrics.orderData(numPizzas, totalCost, orderTime, true);
             res.send({ order, jwt: j.jwt, reportUrl: j.reportUrl });
         } else {
-            metrics.orderData(0, 0, orderDuration, false);
+            metrics.orderData(0, 0, orderTime, false);
             res.status(500).send({
                 message: "Failed to fulfill order at factory",
                 reportUrl: j.reportUrl,
