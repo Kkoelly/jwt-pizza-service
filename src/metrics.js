@@ -11,7 +11,7 @@ class MetricBuilder {
         this.metrics.push(metric);
     }
     toString(sep) {
-        this.metrics.join(sep);
+        return this.metrics.join(sep);
     }
 }
 
@@ -20,18 +20,18 @@ class Metrics {
         const timer = setInterval(() => {
             try {
                 const buf = new MetricBuilder();
-                httpMetrics(buf);
-                systemMetrics(buf);
-                userMetrics(buf);
-                purchaseMetrics(buf);
-                authMetrics(buf);
+                this.httpMetrics(buf);
+                this.systemMetrics(buf);
+                this.userMetrics(buf);
+                this.purchaseMetrics(buf);
+                this.authMetrics(buf);
 
                 const metrics = buf.toString("\n");
                 this.sendMetricToGrafana(metrics);
             } catch (error) {
                 console.log("Error sending metrics", error);
             }
-        }, 10000);
+        }, 5000);
         timer.unref();
 
         this.totalRequests = 0;
@@ -113,14 +113,14 @@ class Metrics {
         buf.addMetric("request", "http", "allRequests", this.totalRequests);
     }
 
-    systemMetrics() {
-        buffer.addMetric(
+    systemMetrics(buf) {
+        buf.addMetric(
             "request",
             "system",
             "cpuPercentage",
             this.getCpuUsagePercentage()
         );
-        buffer.addMetric(
+        buf.addMetric(
             "request",
             "system",
             "memoryUsage",
@@ -128,38 +128,60 @@ class Metrics {
         );
     }
 
-    userMetrics() {
-        buf.addMetric("activeUsers", {}, this.activeUsers);
+    userMetrics(buf) {
+        buf.addMetric(
+            "request",
+            "userMetrics",
+            "activeUsers",
+            this.activeUsers
+        );
     }
 
-    purchaseMetrics() {
-        buf.addMetric("pizzasSold", "pizzas", this.numPizzas);
-        buf.addMetric("revenue", "pizzas", this.revenue);
-        buf.addMetric("creationFailure", "pizzas", this.creationFailures);
-        buf.addMetric("creationLatency", "pizzas", this.pizzaTime);
+    purchaseMetrics(buf) {
+        buf.addMetric("request", "pizzas", "pizzasSold", this.numPizzas);
+        buf.addMetric("request", "pizzas", "revenue", this.revenue);
+        buf.addMetric(
+            "request",
+            "pizzas",
+            "creationFailure",
+            this.creationFailures
+        );
+        buf.addMetric("request", "pizzas", "creationLatency", this.pizzaTime);
     }
 
-    authMetrics() {
-        buf.addMetric("totalAuths", "auth", this.totalAuths);
-        buf.addMetric("successfulAuths", "auth", this.successfulAuths);
-        buf.addMetric("failedAuths", "auth", this.failedAuths);
+    authMetrics(buf) {
+        buf.addMetric("request", "auth", "totalAuths", this.totalAuths);
+        buf.addMetric(
+            "request",
+            "auth",
+            "successfulAuths",
+            this.successfulAuths
+        );
+        buf.addMetric("request", "auth", "failedAuths", this.failedAuths);
     }
 
-    sendMetricToGrafana(metricPrefix, httpMethod, metricName, metricValue) {
-        const metric = `${metricPrefix},source=${config.source},method=${httpMethod} ${metricName}=${metricValue}`;
-
-        fetch(`${config.url}`, {
+    sendMetricToGrafana(metrics) {
+        fetch(`${config.metrics.url}`, {
             method: "post",
-            body: metric,
             headers: {
-                Authorization: `Bearer ${config.userId}:${config.apiKey}`,
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${config.metrics.userId}:${config.metrics.apiKey}`,
             },
+            body: metrics,
         })
             .then((response) => {
                 if (!response.ok) {
+                    console.log({
+                        method: "post",
+                        headers: {
+                            Authorization: `Bearer ${config.metrics.userId}:${config.metrics.apiKey}`,
+                            "Content-Type": "text/plain",
+                        },
+                        body: metrics,
+                    });
                     console.error("Failed to push metrics data to Grafana");
                 } else {
-                    console.log(`Pushed ${metric}`);
+                    console.log(`Pushed ${metrics}`);
                 }
             })
             .catch((error) => {

@@ -4,3 +4,4 @@ config.js
 dist
 jest.config.json
 settings.json
+generatePizzaTraffic.sh
