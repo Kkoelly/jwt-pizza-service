@@ -65,7 +65,6 @@ jobs:
                       apiKey: '${{ secrets.METRICS_API_KEY }}',
                     },            
                   };" > src/config.js
-                  };" > src/config.js
 
             - name: Tests
               run: npm test
