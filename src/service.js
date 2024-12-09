@@ -4,9 +4,9 @@ const orderRouter = require("./routes/orderRouter.js");
 const franchiseRouter = require("./routes/franchiseRouter.js");
 const version = require("./version.json");
 const config = require("./config.js");
+const metrics = require("./metrics.js");
 
 const app = express();
-app.use(metrics.requestTracker);
 
 app.use(express.json());
 app.use(setAuthUser);
@@ -20,6 +20,9 @@ app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Credentials", "true");
     next();
 });
+
+app.use(metrics.requestTracker);
+// app.use(logger.httpLogger);
 
 const apiRouter = express.Router();
 app.use("/api", apiRouter);
@@ -40,6 +43,7 @@ apiRouter.use("/docs", (req, res) => {
 });
 
 app.get("/", (req, res) => {
+    metrics.incrementRequests();
     res.json({
         message: "welcome to JWT Pizza",
         version: version.version,
