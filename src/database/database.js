@@ -85,8 +85,8 @@ class DB {
                 [email]
             );
             const user = userResult[0];
-            const b = await bcrypt.compare(password, user.password);
-            console.log(user, user.password, password, b);
+            // const b = await bcrypt.compare(password, user.password);
+            // console.log(user, user.password, password, b);
             if (!user || !(await bcrypt.compare(password, user.password))) {
                 throw new StatusCodeError("unknown user", 404);
             }

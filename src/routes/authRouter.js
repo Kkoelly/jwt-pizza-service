@@ -102,8 +102,8 @@ authRouter.post(
             password,
             roles: [{ role: Role.Diner }],
         });
-        const auth = await setAuth(user);
         metrics.incrementAuths();
+        const auth = await setAuth(user);
 
         if (res.status === 200) {
             metrics.incrementActiveUsers();
@@ -122,7 +122,6 @@ authRouter.put(
         const { email, password } = req.body;
         const user = await DB.getUser(email, password);
         const auth = await setAuth(user);
-        res.json({ user: user, token: auth });
         metrics.incrementAuths();
         if (res.status === 200) {
             metrics.incrementActiveUsers();
@@ -130,6 +129,7 @@ authRouter.put(
         } else {
             metrics.incrementFailedAuths();
         }
+        res.json({ user: user, token: auth });
     })
 );
 
@@ -139,8 +139,8 @@ authRouter.delete(
     authRouter.authenticateToken,
     asyncHandler(async (req, res) => {
         await clearAuth(req);
-        res.json({ message: "logout successful" });
         metrics.decrementActiveUsers();
+        res.json({ message: "logout successful" });
     })
 );
 

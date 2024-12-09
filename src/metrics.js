@@ -52,7 +52,7 @@ class Metrics {
         this.pizzaTime = 0;
     }
     requestTracker(req, res, next) {
-        switch (req.method) {
+        switch (req.method.toLowerCase()) {
             case "POST":
                 this.postTotal += 1;
                 this.totalRequests += 1;
