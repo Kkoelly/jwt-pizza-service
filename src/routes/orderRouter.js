@@ -112,7 +112,6 @@ orderRouter.get(
     "/",
     authRouter.authenticateToken,
     asyncHandler(async (req, res) => {
-        console.lot("ORDER GET");
         res.json(await DB.getOrders(req.user, req.query.page));
     })
 );
