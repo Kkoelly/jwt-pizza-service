@@ -112,6 +112,7 @@ orderRouter.get(
     "/",
     authRouter.authenticateToken,
     asyncHandler(async (req, res) => {
+        console.lot("ORDER GET");
         res.json(await DB.getOrders(req.user, req.query.page));
     })
 );
@@ -140,14 +141,12 @@ orderRouter.post(
             }),
         });
         const j = await r.json();
-
         const orderTime = Date.now() - startTime;
         const totalCost = orderReq.items.reduce(
             (total, item) => total + item.price,
             0
         );
         const numPizzas = orderReq.items.length;
-
         if (r.ok) {
             metrics.orderData(numPizzas, totalCost, orderTime, true);
             res.send({ order, jwt: j.jwt, reportUrl: j.reportUrl });

@@ -49,25 +49,26 @@ class Metrics {
         this.numPizzas = 0;
         this.creationFailures = 0;
         this.revenue = 0;
-        this.pizzaTime = 0;
+        this.pizzaTimeTotal = 0;
+        this.pizzaTimeCount = 0;
     }
     requestTracker(req, res, next) {
         switch (req.method.toLowerCase()) {
-            case "POST":
+            case "post":
                 this.postTotal += 1;
                 this.totalRequests += 1;
                 break;
-            case "GET":
+            case "get":
                 this.getTotal += 1;
                 this.totalRequests += 1;
                 break;
 
-            case "DELETE":
+            case "delete":
                 this.deleteTotal += 1;
                 this.totalRequests += 1;
                 break;
 
-            case "PUT":
+            case "put":
                 this.putTotal += 1;
                 this.totalRequests += 1;
                 break;
@@ -79,14 +80,18 @@ class Metrics {
     }
 
     incrementActiveUsers() {
+        // console.log("active: ", this.activeUsers);
         this.activeUsers += 1;
     }
 
     decrementActiveUsers() {
-        this.activeUsers -= 1;
+        if (this.activeUsers > 0) {
+            this.activeUsers -= 1;
+        }
     }
 
     incrementAuths() {
+        // console.log("auths: ", this.totalAuths);
         this.totalAuths += 1;
     }
 
@@ -102,7 +107,8 @@ class Metrics {
         if (isSuccess) {
             this.numPizzas += numPizzas;
             this.revenue += totalCost;
-            this.pizzaTime += orderTime;
+            this.pizzaTimeTotal += orderTime;
+            this.pizzaTimeCount += 1;
         } else {
             this.creationFailures += 1;
         }
@@ -149,7 +155,12 @@ class Metrics {
             "creationFailure",
             this.creationFailures
         );
-        buf.addMetric("request", "pizzas", "creationLatency", this.pizzaTime);
+        buf.addMetric(
+            "request",
+            "pizzas",
+            "creationLatency",
+            this.pizzaTimeTotal / this.pizzaTimeCount
+        );
     }
 
     authMetrics(buf) {
@@ -184,7 +195,8 @@ class Metrics {
                     });
                     console.error("Failed to push metrics data to Grafana");
                 } else {
-                    console.log(`Pushed ${metrics}`);
+                    // console.log("Pushed");
+                    console.log(`Pushed ${metrics}\n`);
                 }
             })
             .catch((error) => {

@@ -119,17 +119,18 @@ authRouter.post(
 authRouter.put(
     "/",
     asyncHandler(async (req, res) => {
-        const { email, password } = req.body;
-        const user = await DB.getUser(email, password);
-        const auth = await setAuth(user);
-        metrics.incrementAuths();
-        if (res.status === 200) {
+        try {
+            metrics.incrementAuths();
+            const { email, password } = req.body;
+            const user = await DB.getUser(email, password);
+            const auth = await setAuth(user);
             metrics.incrementActiveUsers();
             metrics.incrementSuccessfulAuths();
-        } else {
+            res.json({ user: user, token: auth });
+        } catch (ex) {
             metrics.incrementFailedAuths();
+            res.json({ message: "failed auth" });
         }
-        res.json({ user: user, token: auth });
     })
 );
 
