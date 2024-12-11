@@ -129,7 +129,8 @@ authRouter.put(
             res.json({ user: user, token: auth });
         } catch (ex) {
             metrics.incrementFailedAuths();
-            res.json({ message: "failed auth" });
+            console.log(ex);
+            res.status(500).send({ message: "failed auth" });
         }
     })
 );
